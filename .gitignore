@@ -1,0 +1,8 @@
+# specs & plans stay local — never commit
+docs/superpowers/
+
+# build artifacts
+sshutil
+dist/
+*.test
+coverage.out

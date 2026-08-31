@@ -1,0 +1,41 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.27"
+      - run: go vet ./...
+      - run: go test ./...
+      - run: go build ./...
+
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ludeeus/action-shellcheck@v2
+        with:
+          check_too_many_files: "false"
+
+  smoke:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image: ["debian:12", "ubuntu:24.04"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Smoke build in ${{ matrix.image }}
+        run: |
+          docker run --rm -v "$PWD":/repo -w /repo ${{ matrix.image }} bash -c '
+            apt-get update -qq && apt-get install -y -qq curl git ca-certificates >/dev/null
+            curl -fsSL https://go.dev/dl/go1.27.0.linux-amd64.tar.gz | tar -C /usr/local -xz
+            export PATH=/usr/local/go/bin:$PATH
+            go build -buildvcs=false -o /tmp/sshutil . && /tmp/sshutil --help'
