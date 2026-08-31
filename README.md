@@ -19,7 +19,7 @@ device into a properly configured member of your tailnet.
 ## Quickstart
 
 ```bash
-git clone <this-repo> ssh && cd ssh
+git clone https://github.com/Olino3/ssh ssh && cd ssh
 ./install.sh
 sshutil          # full interactive wizard
 ```
